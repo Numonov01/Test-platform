@@ -1,0 +1,11 @@
+/* src/index.css */
+.MuiTextField-root .MuiInputLabel-root {
+  position: relative !important;
+  transform: none !important;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.MuiTextField-root .MuiInputBase-root {
+  margin-top: 0 !important;
+}
