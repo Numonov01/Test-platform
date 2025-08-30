@@ -2,15 +2,6 @@
 
 This project is a modern test platform built with React, TypeScript, and Vite. It features a clean UI, user authentication, subject and topic management, and interactive test pages. The UI leverages [Material UI (MUI)](https://mui.com/) for a responsive and customizable design.
 
-## Features
-
-- User authentication (login page, session management via localStorage)
-- List of subjects and modal display of topics for each subject
-- Detailed topic pages and interactive test pages
-- Responsive design with light/dark mode support
-- Custom MUI theme and styles
-- ESLint and TypeScript configuration for code quality
-
 ## Getting Started
 
 Install dependencies and start the development server:
