@@ -4,16 +4,17 @@ import { useParams, Link } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
-import Grid from "@mui/material/Grid";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
+import Grid from "@mui/material/Grid";
+import Chip from "@mui/material/Chip";
 
 // TypeScript interfeyslari
 interface Question {
@@ -56,7 +57,7 @@ const testData: TestData = {
           "1990 yil 20-iyun",
           "1990 yil 19-avgust",
         ],
-        correctAnswer: 2, // indeks 0 dan boshlanadi
+        correctAnswer: 2,
       },
       {
         id: 2,
@@ -113,6 +114,9 @@ export default function TestPage() {
   const [results, setResults] = useState<Results | null>(null);
   const [timeLeft, setTimeLeft] = useState(1800); // 30 daqiqa
   const [showDetails, setShowDetails] = useState(false);
+  const [checkedQuestions, setCheckedQuestions] = useState<{
+    [key: number]: boolean;
+  }>({});
 
   const subjectKey = subject || "";
   const topicIdNum = parseInt(topicId || "0");
@@ -141,9 +145,14 @@ export default function TestPage() {
   const handleAnswer = (questionId: number, answerIndex: number): void => {
     setAnswers((prev) => ({ ...prev, [questionId]: answerIndex }));
 
-    // Ketma-ket rejimda avtomatik keyingi savolga o'tish
-    if (mode === "sequential" && currentQuestion < totalQuestions - 1) {
-      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 500);
+    // Faqat ketma-ket rejimda tekshirish va keyingi savolga o'tish
+    if (mode === "sequential") {
+      setCheckedQuestions((prev) => ({ ...prev, [questionId]: true }));
+
+      // Ketma-ket rejimda keyingi savolga o'tish
+      if (currentQuestion < totalQuestions - 1) {
+        setTimeout(() => setCurrentQuestion(currentQuestion + 1), 1000);
+      }
     }
   };
 
@@ -179,6 +188,7 @@ export default function TestPage() {
     setResults(null);
     setTimeLeft(1800);
     setShowDetails(false);
+    setCheckedQuestions({});
   };
 
   if (!mode) {
@@ -356,7 +366,7 @@ export default function TestPage() {
                       let icon = null;
 
                       if (optIndex === correctAnswerIndex) {
-                        bgColor = "#e8f5e9"; // To'g'ri javob uchun yashil rang
+                        bgColor = "#e8f5e9";
                         icon = (
                           <CheckIcon
                             color="success"
@@ -364,7 +374,7 @@ export default function TestPage() {
                           />
                         );
                       } else if (!isCorrect && optIndex === userAnswer) {
-                        bgColor = "#ffebee"; // Noto'g'ri javob uchun qizil rang
+                        bgColor = "#ffebee";
                         icon = (
                           <ClearIcon
                             color="error"
@@ -435,6 +445,76 @@ export default function TestPage() {
         </Box>
       </Box>
 
+      {/* TEST NAVIGATSIYA QATORI - IKKALA REJIM UCHUN */}
+      <Box
+        sx={{
+          mb: 3,
+          position: "sticky",
+          top: 100,
+          backgroundColor: "background.paper",
+          zIndex: 1000,
+          py: 2,
+          borderRadius: 1,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+        }}
+      >
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {questions.map((question, index) => {
+            const isAnswered = answers[question.id] !== undefined;
+
+            // Ketma-ket rejim uchun ranglar
+            let chipColor: "default" | "primary" | "success" | "error" =
+              "default";
+            let chipVariant: "filled" | "outlined" = "outlined";
+
+            if (mode === "sequential") {
+              const isCorrect =
+                isAnswered && answers[question.id] === question.correctAnswer;
+              const isChecked = checkedQuestions[question.id];
+
+              if (currentQuestion === index) {
+                chipColor = "primary";
+                chipVariant = "filled";
+              } else if (isAnswered && isChecked) {
+                chipColor = isCorrect ? "success" : "error";
+                chipVariant = "filled";
+              } else if (isAnswered) {
+                chipVariant = "filled";
+              }
+            } else {
+              // Ko'p qismli rejim - faqat javob berilganligini ko'rsatish
+              chipVariant = isAnswered ? "filled" : "outlined";
+              chipColor = isAnswered ? "primary" : "default";
+            }
+
+            return (
+              <Chip
+                key={index}
+                label={`${index + 1}`}
+                onClick={() => {
+                  setCurrentQuestion(index);
+                  if (mode === "all") {
+                    const element = document.getElementById(
+                      `question-${question.id}`
+                    );
+                    if (element) {
+                      element.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }
+                }}
+                color={chipColor}
+                variant={chipVariant}
+                sx={{
+                  minWidth: 40,
+                  fontWeight: isAnswered ? "bold" : "normal",
+                }}
+              />
+            );
+          })}
+        </Box>
+      </Box>
+
       {mode === "sequential" ? (
         // Ketma-ket rejim
         <Card sx={{ p: 3 }}>
@@ -448,18 +528,65 @@ export default function TestPage() {
 
           <FormControl component="fieldset" sx={{ mt: 2, width: "100%" }}>
             <RadioGroup>
-              {questions[currentQuestion].options.map((option, index) => (
-                <FormControlLabel
-                  key={index}
-                  value={index.toString()}
-                  control={<Radio />}
-                  label={option}
-                  onChange={() =>
-                    handleAnswer(questions[currentQuestion].id, index)
+              {questions[currentQuestion].options.map((option, index) => {
+                const isCorrectAnswer =
+                  index === questions[currentQuestion].correctAnswer;
+                const isUserAnswer =
+                  answers[questions[currentQuestion].id] === index;
+                const isChecked =
+                  checkedQuestions[questions[currentQuestion].id];
+
+                let optionStyle = {};
+                if (isChecked) {
+                  if (isCorrectAnswer) {
+                    optionStyle = {
+                      backgroundColor: "#e8f5e9",
+                      borderRadius: 1,
+                      padding: "4px 8px",
+                      display: "flex",
+                      alignItems: "center",
+                    };
+                  } else if (isUserAnswer && !isCorrectAnswer) {
+                    optionStyle = {
+                      backgroundColor: "#ffebee",
+                      borderRadius: 1,
+                      padding: "4px 8px",
+                      display: "flex",
+                      alignItems: "center",
+                    };
                   }
-                  checked={answers[questions[currentQuestion].id] === index}
-                />
-              ))}
+                }
+
+                return (
+                  <FormControlLabel
+                    key={index}
+                    value={index.toString()}
+                    control={<Radio />}
+                    label={
+                      <Box sx={optionStyle}>
+                        {option}
+                        {isChecked && isCorrectAnswer && (
+                          <CheckIcon
+                            color="success"
+                            sx={{ fontSize: 16, ml: 1 }}
+                          />
+                        )}
+                        {isChecked && isUserAnswer && !isCorrectAnswer && (
+                          <ClearIcon
+                            color="error"
+                            sx={{ fontSize: 16, ml: 1 }}
+                          />
+                        )}
+                      </Box>
+                    }
+                    onChange={() =>
+                      handleAnswer(questions[currentQuestion].id, index)
+                    }
+                    checked={answers[questions[currentQuestion].id] === index}
+                    disabled={checkedQuestions[questions[currentQuestion].id]}
+                  />
+                );
+              })}
             </RadioGroup>
           </FormControl>
 
@@ -482,7 +609,7 @@ export default function TestPage() {
           </Box>
         </Card>
       ) : (
-        // Ko'p qismli rejim
+        // Ko'p qismli rejim - faqat javob berish, tekshirish emas
         <Box>
           <Typography variant="h5" gutterBottom>
             Barcha Savollar
@@ -490,7 +617,11 @@ export default function TestPage() {
 
           <Grid container spacing={2}>
             {questions.map((question, index) => (
-              <Grid size={{ xs: 12 }} key={question.id}>
+              <Grid
+                size={{ xs: 12 }}
+                key={question.id}
+                id={`question-${question.id}`}
+              >
                 <Card sx={{ p: 3 }}>
                   <Typography
                     variant="body2"
