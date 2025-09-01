@@ -172,7 +172,7 @@ export default function TopicsModal({
   const handleTopicClick = (topicId: number) => {
     // Mavzuga bosilganda detallar sahifasiga yo'naltirish
     navigate(`/subject/${subject.toLowerCase()}/topic/${topicId}`);
-    onClose(); // Modalni yopish
+    onClose();
   };
 
   return (

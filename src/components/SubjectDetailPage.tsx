@@ -10,7 +10,6 @@ import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-// Mavzular ma'lumotlari
 type TopicDetail = {
   title: string;
   duration: string;
