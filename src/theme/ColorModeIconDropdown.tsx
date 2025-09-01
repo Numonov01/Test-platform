@@ -75,13 +75,13 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem selected={mode === "system"} onClick={handleMode("system")}>
-          System
+          Tizim
         </MenuItem>
         <MenuItem selected={mode === "light"} onClick={handleMode("light")}>
-          Light
+          Yorug‘
         </MenuItem>
         <MenuItem selected={mode === "dark"} onClick={handleMode("dark")}>
-          Dark
+          Qorong‘i
         </MenuItem>
       </Menu>
     </React.Fragment>

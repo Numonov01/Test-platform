@@ -1,5 +1,5 @@
 // src/components/TestPage.tsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -120,21 +120,10 @@ export default function TestPage() {
 
   const subjectKey = subject || "";
   const topicIdNum = parseInt(topicId || "0");
-  const questions =
-    (testData[subjectKey] && testData[subjectKey][topicIdNum]) || [];
+  const questions = useMemo(() => {
+    return (testData[subjectKey] && testData[subjectKey][topicIdNum]) || [];
+  }, [subjectKey, topicIdNum]);
   const totalQuestions = questions.length;
-
-  // Vaqtni hisoblash
-  useEffect(() => {
-    if (mode && timeLeft > 0) {
-      const timer = setTimeout(() => {
-        setTimeLeft(timeLeft - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (timeLeft === 0) {
-      handleFinishTest();
-    }
-  }, [mode, timeLeft]);
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -156,7 +145,7 @@ export default function TestPage() {
     }
   };
 
-  const handleFinishTest = (): void => {
+  const handleFinishTest = useCallback((): void => {
     let correctCount = 0;
     const questionResults: Results["details"] = {};
 
@@ -179,7 +168,19 @@ export default function TestPage() {
       percentage: Math.round((correctCount / totalQuestions) * 100),
       details: questionResults,
     });
-  };
+  }, [answers, questions, totalQuestions]);
+
+  // Vaqtni hisoblash
+  useEffect(() => {
+    if (mode && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else if (timeLeft === 0) {
+      handleFinishTest();
+    }
+  }, [mode, timeLeft, handleFinishTest]);
 
   const resetTest = (): void => {
     setMode(null);
@@ -205,7 +206,7 @@ export default function TestPage() {
 
         <Box sx={{ textAlign: "center", my: 8 }}>
           <Typography variant="h4" gutterBottom fontWeight="bold">
-            Testni Boshlash
+            Testni boshlash
           </Typography>
 
           <Typography variant="h6" color="primary" gutterBottom>

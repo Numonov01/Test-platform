@@ -133,7 +133,7 @@ export default function SubjectDetailPage() {
           startIcon={<PlayArrowIcon />}
           sx={{ px: 2 }}
         >
-          Testni Boshlash
+          Testni boshlash
         </Button>
       </Box>
     </Container>
