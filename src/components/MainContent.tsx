@@ -33,7 +33,9 @@ const cardData = [
     title: "Fizika laboratoriya tajribalari va amaliy qo'llanma",
     description:
       "Fizika fanini tushunishda laboratoriya tajribalarining ahamiyati. Yangi uskunalar va virtual laboratoriyalar yordamida fizik hodisalarni o'rganish metodikasi.",
-    authors: [{ name: "Karimov Jasur", avatar: "/static/images/avatar/6.jpg" }],
+    authors: [
+      { name: "Karimov Sardor", avatar: "/static/images/avatar/6.jpg" },
+    ],
   },
   {
     tag: "Kimyo",
