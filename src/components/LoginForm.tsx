@@ -16,7 +16,6 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   gap: theme.spacing(2),
   maxWidth: 400,
   margin: "0 auto",
-  marginTop: theme.spacing(8),
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -49,7 +48,16 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
   };
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container
+      component="main"
+      maxWidth="sm"
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <StyledPaper elevation={8}>
         <Typography component="h1" variant="h5" fontWeight="bold" gutterBottom>
           Tizimga kirish

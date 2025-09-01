@@ -309,7 +309,7 @@ export default function TestPage() {
 
           <Button
             variant="contained"
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, my: 1 }}
             onClick={() => setShowDetails(!showDetails)}
           >
             {showDetails ? "Natijalarni yashirish" : "Tafsilotlarni ko'rsatish"}
