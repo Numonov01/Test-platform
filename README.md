@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [https://test-platform-ten.vercel.app/](https://test-platform-ten.vercel.app/) in your browser.
 
 ## Technologies Used
 
@@ -46,6 +46,16 @@ export default tseslint.config([
 ```
 
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules.
+
+## Images
+
+![Login Parol](public/login.png.png)
+![Landing page](public/dash.png)
+![Topic](public/topic.png)
+![Information](public/ex.png)
+![Test](public/test.png)
+![Result](public/rezult.png)
+![Light](public/light.png)
 
 ## Usage
 
