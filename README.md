@@ -49,7 +49,7 @@ You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-re
 
 ## Images
 
-![Login Parol](public/login.png.png)
+![Login Parol](public/login.png)
 ![Landing page](public/dash.png)
 ![Topic](public/topic.png)
 ![Information](public/ex.png)
