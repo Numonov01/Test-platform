@@ -86,19 +86,25 @@ function Author({
         }}
       >
         <AvatarGroup max={3}>
-          {authors.map((author, index) => (
-            <Avatar
-              key={index}
-              alt={`${author.first_name} ${author.last_name}`}
-              src={author.profile_photo || undefined}
-              sx={{ width: 24, height: 24 }}
-            />
-          ))}
+          {authors.map((author, index) => {
+            const initials = author.first_name?.[0] || "";
+            return (
+              <Avatar
+                key={index}
+                alt={`${author.first_name} ${author.last_name}`}
+                src={author.profile_photo || undefined}
+                sx={{ width: 24, height: 24, fontSize: 12 }}
+              >
+                {!author.profile_photo && initials}
+              </Avatar>
+            );
+          })}
         </AvatarGroup>
         <Typography variant="caption">
           {authors.map((a) => `${a.first_name} ${a.last_name}`).join(", ")}
         </Typography>
       </Box>
+
       <Typography variant="caption">Mavzular soni: {theme_count}</Typography>
     </Box>
   );
