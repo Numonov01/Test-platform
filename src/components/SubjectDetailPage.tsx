@@ -1,5 +1,6 @@
-// src/components/SubjectDetailPage.tsx
-import { useParams, Link } from "react-router-dom";
+// src/components/SubjectDetailPage.tsx - Update to use the new hook
+import { useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -9,72 +10,50 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import { Select, type SelectChangeEvent } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useThemeDetail } from "../service/themes";
 
-type TopicDetail = {
-  title: string;
-  duration: string;
-  description: string;
-  content: string;
-};
-
-const topicDetails: Record<string, Record<number, TopicDetail>> = {
-  matematika: {
-    1: {
-      title: "Algebraik ifodalar",
-      duration: "2 soat",
-      description:
-        "Algebraik ifodalarni soddalashtirish va ular ustida amallar",
-      content:
-        "Algebraik ifodalar - bu sonlar va o'zgaruvchilarning arifmetik amallar yordamida bog'langan shakli. Ular matematikada muhim o'rin tutadi va turli masalalarni yechishda qo'llaniladi.",
-    },
-    2: {
-      title: "Tenglamalar sistemasi",
-      duration: "3 soat",
-      description: "Chiziqli va chiziqli bo'lmagan tenglamalar sistemasi",
-      content:
-        "Tenglamalar sistemasi - bu bir nechta tenglamalarning birgalikda yechilishi. Chiziqli tenglamalar sistemasi eng ko'p qo'llaniladigan tenglamalar tizimi hisoblanadi.",
-    },
-    3: {
-      title: "Geometrik shakllar",
-      duration: "4 soat",
-      description: "Geometrik shakllarning xossalari va ularning yuzalari",
-      content:
-        "Geometrik shakllar - fazoda joylashgan nuqtalar to'plami. Ular o'ziga xos xossalarga ega bo'lib, turli hisoblashlar uchun asos bo'la oladi.",
-    },
-  },
-  fizika: {
-    1: {
-      title: "Mexanika",
-      duration: "3 soat",
-      description: "Harakat va kuchlar haqida tushuncha",
-      content:
-        "Mexanika - fizikaning jismlarning harakati va ularga ta'sir etuvchi kuchlar haqidagi bo'limi.",
-    },
-  },
-  kimyo: {
-    1: {
-      title: "Atom tuzilishi",
-      duration: "2 soat",
-      description: "Atomning asosiy qismlari va ularning xossalari",
-      content:
-        "Atom - materiyaning eng kichik qismi bo'lib, u kimyoviy xossalarni saqlaydi. Atom yadrosi va elektronlardan tashkil topgan.",
-    },
-  },
-};
+// Remove the hardcoded topicDetails and use the API instead
 
 export default function SubjectDetailPage() {
-  const { subject, topicId } = useParams<{
+  const { subject, themeId } = useParams<{
     subject: string;
-    topicId: string;
+    themeId: string;
   }>();
-  const topic = topicDetails[subject || ""]?.[parseInt(topicId || "0")];
 
-  if (!topic) {
+  const { theme, loading, error } = useThemeDetail(themeId);
+  const navigate = useNavigate();
+
+  // Test soni va tartibi uchun state
+  const [testCount, setTestCount] = useState<string>("5");
+  const [testOrder, setTestOrder] = useState<string>("random");
+
+  if (loading) {
+    return (
+      <Container
+        maxWidth="lg"
+        sx={{
+          py: 4,
+          mt: 8,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: "50vh",
+        }}
+      >
+        <CircularProgress />
+      </Container>
+    );
+  }
+
+  if (error || !theme) {
     return (
       <Container maxWidth="lg" sx={{ py: 4, mt: 8 }}>
         <Button
-          component={Link}
-          to="/"
+          onClick={() => navigate(-1)}
           startIcon={<ArrowBackIcon />}
           sx={{ mb: 3 }}
         >
@@ -90,11 +69,18 @@ export default function SubjectDetailPage() {
     );
   }
 
+  const handleTestCountChange = (event: SelectChangeEvent) => {
+    setTestCount(event.target.value);
+  };
+
+  const handleTestOrderChange = (event: SelectChangeEvent) => {
+    setTestOrder(event.target.value);
+  };
+
   return (
     <Container maxWidth="lg" sx={{ py: 4, mt: 8 }}>
       <Button
-        component={Link}
-        to="/"
+        onClick={() => navigate(-1)}
         startIcon={<ArrowBackIcon />}
         sx={{ mb: 3 }}
       >
@@ -102,11 +88,11 @@ export default function SubjectDetailPage() {
       </Button>
 
       <Typography variant="h4" gutterBottom fontWeight="bold">
-        {topic.title}
+        {theme.name}
       </Typography>
 
       <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-        {subject?.toUpperCase()} • Davomiylik: {topic.duration}
+        {subject?.toUpperCase()} • Davomiylik: {theme.duration} min
       </Typography>
 
       <Card variant="outlined" sx={{ mt: 4 }}>
@@ -115,22 +101,79 @@ export default function SubjectDetailPage() {
             Mavzu haqida
           </Typography>
           <Typography variant="body1" paragraph>
-            {topic.description}
+            {theme.description}
           </Typography>
           <Divider sx={{ my: 2 }} />
-          <Typography variant="body1">{topic.content}</Typography>
+          {/* Display the HTML content if available */}
+          {theme.full_html_file ? (
+            <div dangerouslySetInnerHTML={{ __html: theme.full_html_file }} />
+          ) : (
+            <Typography variant="body1">
+              Ushbu mavzu uchun tarkib mavjud emas.
+            </Typography>
+          )}
         </CardContent>
       </Card>
 
-      {/* Testni boshlash tugmasi */}
-      <Box sx={{ mt: 4, display: "flex", justifyContent: "end" }}>
+      {/* Testni boshlash */}
+      <Box
+        sx={{
+          mt: 4,
+          display: "flex",
+          justifyContent: "end",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 2,
+        }}
+      >
+        <FormControl sx={{ minWidth: 140 }}>
+          <Select
+            labelId="test-count-label"
+            value={testCount}
+            label="Test soni"
+            onChange={handleTestCountChange}
+            size="small"
+            sx={{
+              px: 3,
+              py: 1,
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+          >
+            <MenuItem value="5">5 ta test</MenuItem>
+            <MenuItem value="10">10 ta test</MenuItem>
+            <MenuItem value="20">20 ta test</MenuItem>
+            <MenuItem value="25">25 ta test</MenuItem>
+            <MenuItem value="30">30 ta test</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl sx={{ minWidth: 140 }}>
+          <Select
+            labelId="test-order-label"
+            value={testOrder}
+            label="Test tartibi"
+            onChange={handleTestOrderChange}
+            size="small"
+            sx={{
+              px: 3,
+              py: 1,
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+          >
+            <MenuItem value="random">Tasodifiy</MenuItem>
+            <MenuItem value="sequential">Ketma-ket</MenuItem>
+          </Select>
+        </FormControl>
         <Button
           component={Link}
-          to={`/test/${subject}/${topicId}`}
+          to={`/test/${subject}/${themeId}?count=${testCount}&order=${testOrder}`}
           variant="contained"
           size="large"
           startIcon={<PlayArrowIcon />}
-          sx={{ px: 2 }}
+          sx={{ px: 3, py: 1 }}
         >
           Testni boshlash
         </Button>

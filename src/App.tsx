@@ -68,7 +68,7 @@ export default function Blog(props: { disableCustomTheme?: boolean }) {
                 }
               />
               <Route
-                path="/subject/:subject/topic/:topicId"
+                path="/subject/:subject/theme/:themeId"
                 element={<SubjectDetailPage />}
               />
               <Route path="/test/:subject/:topicId" element={<TestPage />} />

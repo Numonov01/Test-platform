@@ -1,4 +1,3 @@
-// src/components/LoginForm.tsx
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -7,6 +6,7 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
+import { useLogin } from "../service/login";
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
@@ -38,12 +38,17 @@ interface LoginFormProps {
 export default function LoginForm({ onLogin }: LoginFormProps) {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const { loginUser, loading, error } = useLogin();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // For now, any input will work since there's no backend
     if (username.trim() && password.trim()) {
-      onLogin();
+      try {
+        await loginUser(username, password);
+        onLogin();
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 
@@ -89,17 +94,20 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
             onChange={(e) => setPassword(e.target.value)}
             variant="outlined"
           />
+          {error && (
+            <Typography variant="body2" color="error" align="center">
+              {error}
+            </Typography>
+          )}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
+            disabled={loading}
           >
-            Kirish
+            {loading ? "Kirilmoqda..." : "Kirish"}
           </Button>
-          <Typography variant="body2" color="text.secondary" align="center">
-            Hozircha backend yo'q, istalgan login va parol ishlaydi
-          </Typography>
         </Box>
       </StyledPaper>
     </Container>

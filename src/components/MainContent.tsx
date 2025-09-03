@@ -6,7 +6,6 @@ import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Chip from "@mui/material/Chip";
-import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
@@ -16,65 +15,9 @@ import { styled } from "@mui/material/styles";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import RssFeedRoundedIcon from "@mui/icons-material/RssFeedRounded";
 import TopicsModal from "./TopicsModal";
-
-const cardData = [
-  {
-    tag: "Matematika",
-    title: "Matematika fanini o'rganishning zamonaviy usullari",
-    description:
-      "Zamonaviy matematika darslarida interfaol usullar va amaliy misollar orqali murakkab tushunchalarni osonlashtirish. Yangi pedagogik texnologiyalar va dasturlar haqida batafsil.",
-    authors: [
-      { name: "Aliyev Sanjar", avatar: "/static/images/avatar/1.jpg" },
-      { name: "Hasanova Dilnoz", avatar: "/static/images/avatar/2.jpg" },
-    ],
-  },
-  {
-    tag: "Fizika",
-    title: "Fizika laboratoriya tajribalari va amaliy qo'llanma",
-    description:
-      "Fizika fanini tushunishda laboratoriya tajribalarining ahamiyati. Yangi uskunalar va virtual laboratoriyalar yordamida fizik hodisalarni o'rganish metodikasi.",
-    authors: [
-      { name: "Karimov Sardor", avatar: "/static/images/avatar/6.jpg" },
-    ],
-  },
-  {
-    tag: "Kimyo",
-    title: "Kimyo fanini hayotiy misollar bilan o'rganish",
-    description:
-      "Kundalik hayotdagi kimyoviy jarayonlar va ularning izohlari. Kimyoviy formulalarni yodlash emas, balki tushunishga qaratilgan innovatsion o'qitish usullari.",
-    authors: [
-      { name: "Olimova Shahnoza", avatar: "/static/images/avatar/7.jpg" },
-    ],
-  },
-  {
-    tag: "Biologiya",
-    title: "Biologik tadqiqotlar va tabiatni o'rganish",
-    description:
-      "Zamonaviy biologiya fanidagi so'nggi kashfiyotlar va ularning amaliy ahamiyati. O'simliklar va hayvonlar dunyosidagi qiziqarli hodisalar haqida batafsil ma'lumot.",
-    authors: [
-      { name: "Yusupova Feruza", avatar: "/static/images/avatar/3.jpg" },
-    ],
-  },
-  {
-    tag: "Informatika",
-    title: "Dasturlash asoslari va algoritmik tafakkur",
-    description:
-      "Zamonaviy informatika darslarida dasturlish tillari va ularning qo'llanilishi. Algorithmik muammolarni yechishda mantiqiy fikrlashni rivojlantirish usullari.",
-    authors: [
-      { name: "Temirov Aziz", avatar: "/static/images/avatar/4.jpg" },
-      { name: "G'aniyeva Madina", avatar: "/static/images/avatar/5.jpg" },
-    ],
-  },
-  {
-    tag: "Adabiyot",
-    title: "Adabiyotshunoslik va she'riyat tahlili",
-    description:
-      "Adabiy asarlarni chuqur tahlil qilish va badiiy uslubni o'rganish. O'zbek va jahon adabiyotining tanqli namunalari va ularning tahliy usullari.",
-    authors: [
-      { name: "Nosirova Laylo", avatar: "/static/images/avatar/2.jpg" },
-    ],
-  },
-];
+import { useSubjects } from "../service/subjects";
+import { Grid } from "@mui/material";
+import type { Subject } from "../types/subjects";
 
 const SyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
@@ -112,7 +55,17 @@ const StyledTypography = styled(Typography)({
   textOverflow: "ellipsis",
 });
 
-function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
+function Author({
+  authors,
+  theme_count,
+}: {
+  authors: {
+    first_name: string;
+    last_name: string;
+    profile_photo: string | null;
+  }[];
+  theme_count: number;
+}) {
   return (
     <Box
       sx={{
@@ -136,19 +89,28 @@ function Author({ authors }: { authors: { name: string; avatar: string }[] }) {
           {authors.map((author, index) => (
             <Avatar
               key={index}
-              alt={author.name}
-              src={author.avatar}
+              alt={`${author.first_name} ${author.last_name}`}
+              src={author.profile_photo || undefined}
               sx={{ width: 24, height: 24 }}
             />
           ))}
         </AvatarGroup>
         <Typography variant="caption">
-          {authors.map((author) => author.name).join(", ")}
+          {authors.map((a) => `${a.first_name} ${a.last_name}`).join(", ")}
         </Typography>
       </Box>
-      <Typography variant="caption">Dars soati: 45 daqiqa</Typography>
+      <Typography variant="caption">Mavzular soni: {theme_count}</Typography>
     </Box>
   );
+}
+
+interface SubjectCardProps {
+  data: Subject;
+  index: number;
+  focusedCardIndex: number | null;
+  handleFocus: (index: number) => void;
+  handleBlur: () => void;
+  onClick: () => void;
 }
 
 function SubjectCard({
@@ -158,14 +120,7 @@ function SubjectCard({
   handleFocus,
   handleBlur,
   onClick,
-}: {
-  data: (typeof cardData)[0];
-  index: number;
-  focusedCardIndex: number | null;
-  handleFocus: (index: number) => void;
-  handleBlur: () => void;
-  onClick: () => void;
-}) {
+}: SubjectCardProps) {
   return (
     <Grid size={{ xs: 12, md: 6, lg: 4 }}>
       <SyledCard
@@ -184,16 +139,16 @@ function SubjectCard({
             component="div"
             color="primary"
           >
-            {data.tag}
+            {data.category?.name}
           </Typography>
           <Typography gutterBottom variant="h6" component="div">
-            {data.title}
+            {data.name}
           </Typography>
           <StyledTypography variant="body2" color="text.secondary" gutterBottom>
             {data.description}
           </StyledTypography>
         </SyledCardContent>
-        <Author authors={data.authors} />
+        <Author authors={data.authors} theme_count={data.theme_count} />
       </SyledCard>
     </Grid>
   );
@@ -228,6 +183,8 @@ export default function MainContent() {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [selectedSubject, setSelectedSubject] = React.useState("");
 
+  const { subjects, loading, error } = useSubjects();
+
   const handleFocus = (index: number) => {
     setFocusedCardIndex(index);
   };
@@ -249,10 +206,18 @@ export default function MainContent() {
     setModalOpen(false);
   };
 
-  const filteredData =
+  const filteredData: Subject[] =
     activeFilter === "Barcha fanlar"
-      ? cardData
-      : cardData.filter((item) => item.tag === activeFilter);
+      ? subjects
+      : subjects.filter((item: Subject) => item.name === activeFilter);
+
+  if (loading) {
+    return <Typography>Yuklanmoqda...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">Xatolik yuz berdi: {error}</Typography>;
+  }
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4, p: 2 }}>
@@ -298,24 +263,18 @@ export default function MainContent() {
             flexWrap: "wrap",
           }}
         >
-          {[
-            "Barcha fanlar",
-            "Matematika",
-            "Fizika",
-            "Kimyo",
-            "Biologiya",
-            "Informatika",
-            "Adabiyot",
-          ].map((filter) => (
-            <Chip
-              key={filter}
-              onClick={() => handleFilterClick(filter)}
-              size="medium"
-              label={filter}
-              variant={activeFilter === filter ? "filled" : "outlined"}
-              color={activeFilter === filter ? "primary" : "default"}
-            />
-          ))}
+          {["Barcha fanlar", ...subjects.map((s: Subject) => s.name)].map(
+            (filter: string) => (
+              <Chip
+                key={filter}
+                onClick={() => handleFilterClick(filter)}
+                size="medium"
+                label={filter}
+                variant={activeFilter === filter ? "filled" : "outlined"}
+                color={activeFilter === filter ? "primary" : "default"}
+              />
+            )
+          )}
         </Box>
         <Box
           sx={{
@@ -333,15 +292,15 @@ export default function MainContent() {
         </Box>
       </Box>
       <Grid container spacing={2}>
-        {filteredData.map((data, index) => (
+        {filteredData.map((subject: Subject, index: number) => (
           <SubjectCard
-            key={index}
-            data={data}
+            key={subject.id}
+            data={subject}
             index={index}
             focusedCardIndex={focusedCardIndex}
             handleFocus={handleFocus}
             handleBlur={handleBlur}
-            onClick={() => handleCardClick(data.tag)}
+            onClick={() => handleCardClick(subject.name)}
           />
         ))}
       </Grid>
