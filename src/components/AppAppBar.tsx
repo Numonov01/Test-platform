@@ -1,4 +1,4 @@
-// src/components/AppAppBar.tsx (updated)
+// src/components/AppAppBar.tsx
 import * as React from "react";
 import { alpha, styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
