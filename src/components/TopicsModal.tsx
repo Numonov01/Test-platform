@@ -95,6 +95,7 @@ export default function TopicsModal({
                     width: "100%",
                     "&:hover": {
                       backgroundColor: "action.hover",
+                      cursor: "pointer",
                     },
                   }}
                 >
