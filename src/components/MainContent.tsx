@@ -226,7 +226,7 @@ export default function MainContent() {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 4, p: 2 }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
       <div>
         <Typography variant="h4" gutterBottom fontWeight="bold">
           Fanlar ro'yxati
