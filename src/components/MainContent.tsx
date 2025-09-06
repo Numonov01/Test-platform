@@ -16,7 +16,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import RssFeedRoundedIcon from "@mui/icons-material/RssFeedRounded";
 import TopicsModal from "./TopicsModal";
 import { useSubjects } from "../service/subjects";
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import type { Subject } from "../types/subjects";
 
 const SyledCard = styled(Card)(({ theme }) => ({
@@ -218,7 +218,11 @@ export default function MainContent() {
       : subjects.filter((item: Subject) => item.name === activeFilter);
 
   if (loading) {
-    return <Typography>Yuklanmoqda...</Typography>;
+    return (
+      <Box display="flex" justifyContent="center" p={2}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {

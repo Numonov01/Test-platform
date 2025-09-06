@@ -15,6 +15,7 @@ import Footer from "./components/Footer";
 import LoginForm from "./components/LoginForm";
 import SubjectDetailPage from "./components/SubjectDetailPage";
 import TestPage from "./components/TestPage";
+import { Box, CircularProgress } from "@mui/material";
 
 export default function Blog(props: { disableCustomTheme?: boolean }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -39,7 +40,11 @@ export default function Blog(props: { disableCustomTheme?: boolean }) {
   };
 
   if (isLoading) {
-    return <div>Yuklanmoqda...</div>;
+    return (
+      <Box display="flex" justifyContent="center" p={2}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return (

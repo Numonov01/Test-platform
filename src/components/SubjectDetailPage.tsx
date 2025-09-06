@@ -16,8 +16,6 @@ import { Select, type SelectChangeEvent } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useThemeDetail } from "../service/themes";
 
-// Remove the hardcoded topicDetails and use the API instead
-
 export default function SubjectDetailPage() {
   const { subject, themeId } = useParams<{
     subject: string;
